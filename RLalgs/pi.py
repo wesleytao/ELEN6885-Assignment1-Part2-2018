@@ -39,6 +39,8 @@ def policy_iteration(env, gamma, max_iteration, theta):
         #Implement it with function policy_evaluation and policy_improvement
         ############################
         # YOUR CODE STARTS HERE
+        V = policy_evaluation(env,policy,gamma,theta)
+        policy, policy_stable      = policy_improvement(env,V, policy,gamma)
 
         # YOUR CODE ENDS HERE
         ############################
@@ -73,7 +75,23 @@ def policy_evaluation(env, policy, gamma, theta):
     """
     ############################
     # YOUR CODE STARTS HERE
-
+    assert(np.all(np.isin(policy,range(env.nA)))) # check all policy are within the action space
+    V = np.zeros(env.nS) # init state values
+    max_diff = 0
+    n_iter = 0
+    temp_state = -1
+    while(n_iter ==0  or max_diff > theta):
+        n_iter = n_iter + 1
+        max_diff = 0
+        for s in range(env.nS):
+            new_v = sum([p*(r+gamma*V[s]) for p,s,r,t in env.P[s][policy[s]]])
+            if abs(new_v-V[s]) > max_diff:
+                temp_state = s
+                max_diff = abs(new_v - V[s])
+            V[s] = new_v
+        if n_iter > 10000:
+            print("reached 10000 iterations and failed to converge")
+            break
     # YOUR CODE ENDS HERE
     ############################
 
@@ -114,6 +132,17 @@ def policy_improvement(env, value_from_policy, policy, gamma):
     """
     ############################
     # YOUR CODE STARTS HERE
+    q = np.zeros((env.nS,env.nA))
+    for this_state in range(env.nS):
+        for this_action in range(env.nA):
+            q[this_state][this_action] =sum([p*(r+gamma*value_from_policy[s])  for p,s,r,t in env.P[this_state][this_action]])
+    new_policy = np.argmax(q,1)
+            
+    if np.all(policy == new_policy):
+        policy_stable = True
+    else:
+        policy_stable = False
+    policy = new_policy
 
     # YOUR CODE ENDS HERE
     ############################

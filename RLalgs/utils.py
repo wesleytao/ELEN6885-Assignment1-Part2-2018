@@ -32,7 +32,18 @@ def epsilon_greedy(value, e, seed = None):
     
     ############################
     # YOUR CODE STARTS HERE
-
+    # short_cut   
+    n             = value.shape[0]
+    max_index     = value.argmax()
+    if max_index == value.argmin():
+        probability   = [1/n]*n
+    else:
+        probability = [e/n]*n
+        probability[max_index] = probability[max_index] + (1-e)
+        
+    assert(sum(probability)==1)
+#     print(probability)
+    action = np.random.choice(np.arange(n),p=probability)
     # YOUR CODE ENDS HERE
     ############################
     return action
@@ -70,7 +81,7 @@ def action_evaluation(env, gamma, v):
         for a in range(nA):
             ############################
             # YOUR CODE STARTS HERE
-            pass
+            q[s][a] = sum([p*(r+ gamma*v[s]) for p,s,r,t in env.P[s][a]])
             # YOUR CODE ENDS HERE
             ############################
     return q

@@ -34,7 +34,25 @@ def value_iteration(env, gamma, max_iteration, theta):
     #Implement the loop part here
     ############################
     # YOUR CODE STARTS HERE
-
+    max_diff = 0 
+    while(numIterations ==0 or max_diff > theta):
+        max_diff = 0
+        numIterations = numIterations + 1
+        for this_state in range(env.nS):
+            opt_action = -1 
+            opt_value = -1 
+            for this_action in range(env.nA):
+                action_value = sum([p*(r+V[s]*gamma) for p,s,r,t in env.P[this_state][this_action]])
+                if action_value > opt_value:
+                    opt_action = this_action
+                    opt_value = action_value
+            # end of value 
+            if abs(V[this_state] - opt_value)> max_diff:
+                max_diff = abs(V[this_state] - opt_value)
+            V[this_state] = opt_value
+   
+    
+    
     # YOUR CODE ENDS HERE
     ############################
     
@@ -72,7 +90,15 @@ def extract_policy(env, v, gamma):
     policy = np.zeros(env.nS, dtype = np.int32)
     ############################
     # YOUR CODE STARTS HERE
-
+    for this_state in range(env.nS):
+        opt_action = -1
+        max_v = -1
+        for this_action in range(env.nA):
+            this_value = sum([p*(r+gamma*v[s])  for p,s,r,t in env.P[this_state][this_action]])
+            if this_value > max_v:
+                max_v = this_value
+                opt_action = this_action
+        policy[this_state] = opt_action
     # YOUR CODE ENDS HERE
     ############################
 
